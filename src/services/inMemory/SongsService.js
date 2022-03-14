@@ -84,7 +84,7 @@ class songsService {
     const index = this._songs.findIndex(song => song.id === id);
 
     if (index === -1) {
-      throw new NotFoundError('Catatan gagal dihapus, Id tidak ditemukan');
+      throw new NotFoundError('Album gagal dihapus, Id tidak ditemukan');
     }
 
     this._songs.splice(index, 1);
