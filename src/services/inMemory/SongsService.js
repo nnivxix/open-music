@@ -58,8 +58,8 @@ class songsService {
   editSongById(id, {
     title,
     year,
-    genre,
     performer,
+    genre,
     duration,
     albumId
   }) {
@@ -73,8 +73,8 @@ class songsService {
       ...this._songs[index],
       title,
       year,
-      genre,
       performer,
+      genre,
       duration,
       albumId
     };

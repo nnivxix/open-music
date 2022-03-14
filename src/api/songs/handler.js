@@ -7,13 +7,14 @@ class SongsHandler {
     this.postSongHandler = this.postSongHandler.bind(this);
     this.getSongsHandler = this.getSongsHandler.bind(this);
     this.getSongByIdHandler = this.getSongByIdHandler.bind(this);
+    this.putSongByIdHandler = this.putSongByIdHandler.bind(this);
     this.deleteSongByIdHandler = this.deleteSongByIdHandler.bind(this);
   }
 
 
   async postSongHandler(request, h) {
     try {
-      this._validator.validateNotePayload(request.payload);
+      // this._validator.validateNotePayload(request.payload);
       const {
         title,
         year,
@@ -23,7 +24,7 @@ class SongsHandler {
         albumId
       } = request.payload;
 
-      const SongId = await this._service.addSong({
+      const songId = await this._service.addSong({
         title,
         year,
         genre,
@@ -36,7 +37,7 @@ class SongsHandler {
         status: 'success',
         message: 'Lagu berhasil ditambahkan',
         data: {
-          SongId,
+          songId,
         },
       });
       response.code(201);
@@ -67,7 +68,11 @@ class SongsHandler {
     return {
       status: 'success',
       data: {
-        songs,
+        songs: songs.map(song => ({
+          id: song.id,
+          title: song.title,
+          performer: song.performer,
+        }))
       },
     };
   }
@@ -106,7 +111,7 @@ class SongsHandler {
   }
   async putSongByIdHandler(request, h) {
     try {
-      this._validator.validateSongPayload(request.payload);
+      // this._validator.validateSongPayload(request.payload);
       const {
         id
       } = request.params;
