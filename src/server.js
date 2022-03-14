@@ -1,9 +1,9 @@
-require('dotenv').config();
-const Hapi = require('@hapi/hapi');
-const songs = require('./api/songs');
-const albums = require('./api/albums');
-const SongsService = require('./services/inMemory/SongsService');
-const AlbumsService = require('./services/inMemory/AlbumsService');
+require('dotenv',).config();
+const Hapi = require('@hapi/hapi',);
+const songs = require('./api/songs',);
+const albums = require('./api/albums',);
+const SongsService = require('./services/inMemory/SongsService',);
+const AlbumsService = require('./services/inMemory/AlbumsService',);
 
 const init = async () => {
   // const SongsService
@@ -12,27 +12,27 @@ const init = async () => {
     host: process.env.HOST,
     routes: {
       cors: {
-        origin: ['*'],
+        origin: ['*', ],
       },
     },
-  });
+  },);
 
   await server.register([{
       plugin: songs,
       options: {
-        service: new SongsService()
+        service: new SongsService(),
       },
     },
     {
       plugin: albums,
       options: {
-        service: new AlbumsService()
+        service: new AlbumsService(),
       },
-    }
-  ]);
+    },
+  ],);
 
   await server.start();
-  console.log(`Server berjalan pada ${server.info.uri}`);
+  console.log(`Server berjalan pada ${server.info.uri}`,);
 };
 
 init();

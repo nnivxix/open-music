@@ -1,5 +1,5 @@
 const {
-  nanoid
+  nanoid,
 } = require("nanoid");
 const InvariantError = require("../../exceptions/InvariantError");
 const NotFoundError = require("../../exceptions/NotFoundError");
@@ -15,7 +15,7 @@ class songsService {
     genre,
     performer,
     duration,
-    albumId
+    albumId,
   }) {
     const id = `song-${nanoid(16)}`;
 
@@ -27,7 +27,7 @@ class songsService {
       genre,
       performer,
       duration,
-      albumId
+      albumId,
     };
 
     this._songs.push(newSong);
@@ -61,7 +61,7 @@ class songsService {
     performer,
     genre,
     duration,
-    albumId
+    albumId,
   }) {
     const index = this._songs.findIndex((song) => song.id === id);
 
@@ -76,11 +76,11 @@ class songsService {
       performer,
       genre,
       duration,
-      albumId
+      albumId,
     };
   }
 
-  deleteSongById(id) {
+  deleteSongById(id, ) {
     const index = this._songs.findIndex(song => song.id === id);
 
     if (index === -1) {

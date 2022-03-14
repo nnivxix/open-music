@@ -1,4 +1,4 @@
-const routes = (handler) => [{
+const routes = (handler,) => [{
     method: 'POST',
     path: '/songs',
     handler: handler.postSongHandler,
