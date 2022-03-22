@@ -16,13 +16,13 @@ exports.up = pgm => {
       type: 'INT',
       notNull: true
     },
-    genre: {
-      type: 'VARCHAR(12)',
-      notNull: true
-    },
     performer: {
       type: 'VARCHAR(35)',
       notNull: true,
+    },
+    genre: {
+      type: 'VARCHAR(12)',
+      notNull: true
     },
     duration: {
       type: 'INT',

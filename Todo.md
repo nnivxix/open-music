@@ -12,10 +12,10 @@
   - [x] albums
   - [x] songs
 - [x] handling error
-- [ ] validator
-  - [ ] songs
-  - [ ] albums
-- [ ] schema database
+- [x] validator
+  - [x] songs
+  - [x] albums
+- [x] schema database
 
 ## Minor
 

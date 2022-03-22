@@ -8,4 +8,25 @@ const mapAlbumsDB = ({
   year,
 });
 
-module.exports = mapAlbumsDB;
+const mapSongDB = ({
+  id,
+  title,
+  year,
+  genre,
+  performer,
+  duration,
+  albumId,
+}) => ({
+  id,
+  title,
+  year,
+  genre,
+  performer,
+  duration,
+  albumId,
+});
+
+module.exports = {
+  mapAlbumsDB,
+  mapSongDB
+};

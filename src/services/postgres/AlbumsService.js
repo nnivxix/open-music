@@ -5,7 +5,9 @@ const {
   Pool
 } = require('pg');
 const InvariantError = require('../../exceptions/InvariantError');
-const mapAlbumsDB = require('../../utils');
+const {
+  mapAlbumsDB
+} = require('../../utils');
 const NotFoundError = require('../../exceptions/NotFoundError');
 
 class AlbumsService {
