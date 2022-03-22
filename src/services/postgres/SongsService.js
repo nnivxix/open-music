@@ -6,6 +6,8 @@ const {
 } = require('pg');
 const InvariantError = require('../../exceptions/InvariantError');
 const {
+  filterPerformerSongByParam,
+  filterTitleSongByParam,
   mapSongDB
 } = require('../../utils');
 const NotFoundError = require('../../exceptions/NotFoundError');
@@ -37,10 +39,23 @@ class SongsService {
 
     return result.rows[0].id;
   }
-  async getSongs() {
-    const result = await this._pool.query('SELECT * FROM songs');
+  async getSongs(params) {
+    const query = {
+      text: 'SELECT id, title, performer FROM songs'
+    };
+    const result = await this._pool.query(query);
+    console.log(result.rows);
+    const songs = result.rows;
+    let filteredSong = songs;
+    if ('title' in params) {
+      filteredSong = filteredSong.filter((s) => filterTitleSongByParam(s, params.title));
+    }
+    if ('performer' in params) {
+      filteredSong = filteredSong.filter((s) => filterPerformerSongByParam(s, params.performer));
+    }
 
-    return result.rows.map(mapSongDB);
+    return filteredSong;
+    // return result.rows.map(mapSongDB);
   }
 
   async getSongById(id) {
