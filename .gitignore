@@ -3,3 +3,5 @@ node_modules
 .prod.env
 
 NOTE.md
+*.rar
+*.zip
