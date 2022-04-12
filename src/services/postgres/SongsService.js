@@ -44,7 +44,6 @@ class SongsService {
       text: 'SELECT id, title, performer FROM songs'
     };
     const result = await this._pool.query(query);
-    console.log(result.rows);
     const songs = result.rows;
     let filteredSong = songs;
     if ('title' in params) {

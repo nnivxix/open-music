@@ -1,6 +1,6 @@
 require('dotenv', ).config();
 const Hapi = require('@hapi/hapi', );
-
+const Jwt = require('@hapi/jwt');
 // songs
 const songs = require('./api/songs', );
 const SongsValidator = require('./validator/songs');
@@ -22,9 +22,15 @@ const AuthenticationsService = require('./services/postgres/AuthenticationsServi
 const TokenManager = require('./tokenize/TokenManager');
 const AuthenticationsValidator = require('./validator/authentications');
 
+// Playlist
+const playlists = require('./api/playlists');
+const PlaylistsService = require('./services/postgres/PlaylistsService');
+const PlaylistsValidator = require('./validator/playlists');
+
 const init = async () => {
   const authenticationsService = new AuthenticationsService();
   const usersService = new UsersService();
+  const playlistsService = new PlaylistsService();
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -35,6 +41,28 @@ const init = async () => {
       },
     },
   }, );
+
+  // registrasi plugin eksternal
+  await server.register([{
+    plugin: Jwt,
+  }, ]);
+
+  // mendefinisikan strategy autentikasi jwt
+  server.auth.strategy('music_jwt', 'jwt', {
+    keys: process.env.ACCESS_TOKEN_KEY,
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+    },
+    validate: (artifacts) => ({
+      isValid: true,
+      credentials: {
+        id: artifacts.decoded.payload.id,
+      },
+    }),
+  });
 
   await server.register([{
       plugin: songs,
@@ -65,7 +93,14 @@ const init = async () => {
         tokenManager: TokenManager,
         validator: AuthenticationsValidator,
       },
-    }
+    },
+    {
+      plugin: playlists,
+      options: {
+        service: playlistsService,
+        validator: PlaylistsValidator,
+      },
+    },
   ], );
 
   await server.start();
