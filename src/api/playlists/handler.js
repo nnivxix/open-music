@@ -14,6 +14,7 @@ class PlaylistsHandler {
     this.postPlaylistSongHandler = this.postPlaylistSongHandler.bind(this);
     this.getPlaylistSongsHandler = this.getPlaylistSongsHandler.bind(this);
     this.deletePlaylistSongByIdHandler = this.deletePlaylistSongByIdHandler.bind(this);
+    this.getPlaylistActivitiesHandler = this.getPlaylistActivitiesHandler.bind(this);
   }
 
   async postPlaylistHandler(request, h) {
@@ -167,9 +168,10 @@ class PlaylistsHandler {
       const {
         id: credentialId
       } = request.auth.credentials;
+
       await this._service.verifyPlaylistOwner(playlistId, credentialId);
       await this._service.addSongToPlaylist(playlistId, songId);
-
+      await this._service.addActivity(playlistId, songId, credentialId);
       const response = h.response({
         status: 'success',
         message: 'Lagu berhasil ditambahkan ke playlist',
@@ -249,9 +251,10 @@ class PlaylistsHandler {
       const {
         id: credentialId
       } = request.auth.credentials;
-      await this._service.verifyPlaylistOwner(playlistId, credentialId);
 
+      await this._service.verifyPlaylistOwner(playlistId, credentialId);
       await this._service.deleteSongFromPlaylist(playlistId, songId);
+      await this._service.deleteActivity(playlistId, songId, credentialId);
 
       return {
         status: 'success',
@@ -277,6 +280,47 @@ class PlaylistsHandler {
       return response;
     }
 
+  }
+
+  async getPlaylistActivitiesHandler(request, h) {
+    try {
+      const {
+        id
+      } = request.params;
+      const {
+        id: credentialId
+      } = request.auth.credentials;
+
+      await this._service.verifyPlaylistOwner(id, credentialId);
+      const activities = await this._service.getPlaylistActivities(id);
+
+      const response = h.response({
+        status: 'success',
+        data: activities
+      });
+
+      response.code(200);
+      return response;
+    } catch (error) {
+      if (error instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: error.message
+        });
+
+        response.code(error.statusCode);
+        return response;
+      }
+
+      const response = h.response({
+        status: 'error',
+        message: 'Maaf, terjadi kegagalan pada server kami.'
+      });
+
+      response.code(500);
+      console.error(error);
+      return response;
+    }
   }
 
 }

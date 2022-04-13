@@ -158,6 +158,89 @@ class PlaylistsService {
       throw new InvariantError('Lagu gagal dihapus dari playlist.Id lagu tidak ditemukan');
     }
   }
+
+  async addActivity(playlistId, songId, userId) {
+    const querySong = {
+      text: 'SELECT title FROM songs WHERE id = $1',
+      values: [songId]
+    };
+
+    const resultSong = await this._pool.query(querySong);
+    const songTitle = resultSong.rows[0].title;
+
+    const queryUser = {
+      text: 'SELECT username FROM users WHERE id = $1',
+      values: [userId]
+    };
+
+    const resultUser = await this._pool.query(queryUser);
+    const username = resultUser.rows[0].username;
+
+    const idActivities = 'activity-' + nanoid(16);
+    const timeActivity = new Date().toISOString();
+
+    const queryActivities = {
+      text: 'INSERT INTO playlist_activities (id, playlist_id, song_id, user_id, action, time) VALUES ($1, $2, $3, $4, $5, $6)',
+      values: [idActivities, playlistId, songTitle, username, 'add', timeActivity]
+    };
+
+    await this._pool.query(queryActivities);
+  }
+
+  async deleteActivity(playlistId, songId, userId) {
+    const querySong = {
+      text: 'SELECT title FROM songs WHERE id = $1',
+      values: [songId]
+    };
+
+    const resultSong = await this._pool.query(querySong);
+    const songTitle = resultSong.rows[0].title;
+
+    const queryUser = {
+      text: 'SELECT username FROM users WHERE id = $1',
+      values: [userId]
+    };
+
+    const resultUser = await this._pool.query(queryUser);
+    const username = resultUser.rows[0].username;
+
+    const idActivities = 'activity-' + nanoid(16);
+    const timeActivity = new Date().toISOString();
+
+    const queryActivities = {
+      text: 'INSERT INTO playlist_activities (id, playlist_id, song_id, user_id, action, time) VALUES ($1, $2, $3, $4, $5, $6)',
+      values: [idActivities, playlistId, songTitle, username, 'delete', timeActivity]
+    };
+
+    await this._pool.query(queryActivities);
+  }
+
+  async getPlaylistActivities(playlistId) {
+    const query = {
+      text: 'SELECT * FROM playlist_activities WHERE playlist_id = $1',
+      values: [playlistId]
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Tidak ada aktivitas');
+    }
+
+    const resultMap = result.rows.map(row => {
+      return {
+        username: row.user_id,
+        title: row.song_id,
+        action: row.action,
+        time: row.time
+      };
+    });
+
+    return {
+      playlistId: playlistId,
+      activities: resultMap
+    };
+  }
 }
 
 module.exports = PlaylistsService;
