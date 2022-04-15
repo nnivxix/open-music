@@ -9,9 +9,9 @@ const NotFoundError = require('../../exceptions/NotFoundError');
 const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistsService {
-  constructor() {
+  constructor(collaborationService) {
     this._pool = new Pool();
-    // this._collaborationService = collaborationService;
+    this._collaborationService = collaborationService;
   }
 
   async addPlaylist({
@@ -36,9 +36,10 @@ class PlaylistsService {
 
   async getPlaylists(owner) {
     const query = {
-      text: `SELECT playlists.id, playlists.name, users.username FROM playlists
-            LEFT JOIN users ON users.id = playlists.owner
-            WHERE playlists.owner = $1`,
+      // text: `SELECT playlists.id, playlists.name, users.username FROM playlists
+      //       LEFT JOIN users ON users.id = playlists.owner
+      //       WHERE playlists.owner = $1`,
+      text: 'SELECT playlists.id, playlists.name, users.username AS username FROM playlists LEFT JOIN collaborations ON collaborations.playlist_id = playlists.id LEFT JOIN users ON users.id = playlists.owner WHERE playlists.owner = $1 OR collaborations.user_id = $1 GROUP BY (playlists.id, users.username)',
       values: [owner],
     };
 
@@ -76,20 +77,20 @@ class PlaylistsService {
     }
   }
 
-  // async verifyPlaylistAccess(id, userId) {
-  //     try {
-  //         await this.verifyPlaylistOwner(id, userId);
-  //     } catch (error) {
-  //         if (error instanceof NotFoundError) {
-  //             throw error;
-  //         }
-  //         try {
-  //             await this._collaborationService.verifyCollaborator(id, userId);
-  //         } catch {
-  //             throw error;
-  //         }
-  //     }
-  // }
+  async verifyPlaylistAccess(playlistId, userId) {
+    try {
+      await this.verifyPlaylistOwner(playlistId, userId);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+      try {
+        await this._collaborationService.verifyCollaborator(playlistId, userId);
+      } catch {
+        throw error;
+      }
+    }
+  }
 
   // Playlist
 

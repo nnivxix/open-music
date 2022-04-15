@@ -1,4 +1,7 @@
 const ClientError = require("../../exceptions/ClientError");
+// const InvariantError = require('../../exceptions/InvariantError');
+const NotFoundError = require('../../exceptions/NotFoundError');
+const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistsHandler {
   constructor(service, validator) {
@@ -85,7 +88,7 @@ class PlaylistsHandler {
       const {
         id: credentialId
       } = request.auth.credentials;
-      await this._service.verifyPlaylistOwner(id, credentialId);
+      await this._service.verifyPlaylistAccess(id, credentialId);
 
       const playlist = await this._service.getPlaylistById(id);
       return {
@@ -125,7 +128,7 @@ class PlaylistsHandler {
       const {
         id: credentialId
       } = request.auth.credentials;
-      await this._service.verifyPlaylistOwner(id, credentialId);
+      await this._service.verifyPlaylistAccess(id, credentialId);
 
       await this._service.deletePlaylistById(id);
 
@@ -169,7 +172,7 @@ class PlaylistsHandler {
         id: credentialId
       } = request.auth.credentials;
 
-      await this._service.verifyPlaylistOwner(playlistId, credentialId);
+      await this._service.verifyPlaylistAccess(playlistId, credentialId);
       await this._service.addSongToPlaylist(playlistId, songId);
       await this._service.addActivity(playlistId, songId, credentialId);
       const response = h.response({
@@ -208,7 +211,7 @@ class PlaylistsHandler {
         id: credentialId
       } = request.auth.credentials;
 
-      await this._service.verifyPlaylistOwner(playlistId, credentialId);
+      await this._service.verifyPlaylistAccess(playlistId, credentialId);
       const playlist = await this._service.getSongsFromPlaylist(playlistId);
 
       return {
@@ -252,7 +255,7 @@ class PlaylistsHandler {
         id: credentialId
       } = request.auth.credentials;
 
-      await this._service.verifyPlaylistOwner(playlistId, credentialId);
+      await this._service.verifyPlaylistAccess(playlistId, credentialId);
       await this._service.deleteSongFromPlaylist(playlistId, songId);
       await this._service.deleteActivity(playlistId, songId, credentialId);
 
@@ -291,7 +294,7 @@ class PlaylistsHandler {
         id: credentialId
       } = request.auth.credentials;
 
-      await this._service.verifyPlaylistOwner(id, credentialId);
+      await this._service.verifyPlaylistAccess(id, credentialId);
       const activities = await this._service.getPlaylistActivities(id);
 
       const response = h.response({
@@ -322,6 +325,38 @@ class PlaylistsHandler {
       return response;
     }
   }
+
+  async verifyPlaylistOwner(playlistId, userId) {
+    const query = {
+      text: 'SELECT * FROM playlists WHERE id = $1',
+      values: [playlistId],
+    };
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Playlist not found');
+    }
+    const playlist = result.rows[0];
+    if (playlist.owner !== userId) {
+      throw new AuthorizationError('You don\'t have the right to access this resource');
+    }
+  }
+
+  async verifyPlaylistAccess(playlistId, userId) {
+    try {
+      await this.verifyPlaylistOwner(playlistId, userId);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+      try {
+        await this._collaborationService.verifyCollaborator(playlistId, userId);
+      } catch {
+        throw error;
+      }
+    }
+  }
+
 
 }
 
