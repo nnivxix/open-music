@@ -6,4 +6,3 @@ NOTE.md
 *.rar
 *.zip
 
-src/services/rabbitmq/ProducerService.js
