@@ -6,9 +6,10 @@ module.exports = {
   version: '1.0.1',
   register: async (server, {
     service,
-    validator
+    validator,
+    storageService
   }, ) => {
-    const albumsHandler = new AlbumsHandler(service, validator);
+    const albumsHandler = new AlbumsHandler(service, validator, storageService);
     server.route(routes(albumsHandler));
 
   },

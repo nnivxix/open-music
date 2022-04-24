@@ -6,3 +6,5 @@ NOTE.md
 *.rar
 *.zip
 
+src/api/albums/file/covers
+assets

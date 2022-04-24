@@ -1,6 +1,8 @@
+const path = require('path');
 require('dotenv', ).config();
 const Hapi = require('@hapi/hapi', );
 const Jwt = require('@hapi/jwt');
+const Inert = require('@hapi/inert');
 // songs
 const songs = require('./api/songs', );
 const SongsValidator = require('./validator/songs');
@@ -36,12 +38,15 @@ const CollaborationsValidator = require('./validator/collaborations');
 const _exports = require('./api/exports');
 const ProducerService = require('./services/rabbitmq/ProducerService');
 const ExportsValidator = require('./validator/exports');
+// Storage
+const StorageService = require('./services/storage/StorageService');
 
 const init = async () => {
   const collaborationsService = new CollaborationsService();
   const playlistsService = new PlaylistsService(collaborationsService);
   const authenticationsService = new AuthenticationsService();
   const usersService = new UsersService();
+  const storageService = new StorageService(path.resolve(__dirname, 'api/albums/file/covers'));
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -55,8 +60,12 @@ const init = async () => {
 
   // registrasi plugin eksternal
   await server.register([{
-    plugin: Jwt,
-  }, ]);
+      plugin: Jwt,
+    },
+    {
+      plugin: Inert,
+    },
+  ]);
 
   // mendefinisikan strategy autentikasi jwt
   server.auth.strategy('music_jwt', 'jwt', {
@@ -87,6 +96,7 @@ const init = async () => {
       options: {
         service: new AlbumsService(),
         validator: AlbumsValidator,
+        storageService: storageService,
       },
     },
     {
