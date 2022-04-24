@@ -38,11 +38,17 @@ const CollaborationsValidator = require('./validator/collaborations');
 const _exports = require('./api/exports');
 const ProducerService = require('./services/rabbitmq/ProducerService');
 const ExportsValidator = require('./validator/exports');
+
 // Storage
 const StorageService = require('./services/storage/StorageService');
 
+// Cache
+const CacheService = require('./services/redis/CacheService');
+
 const init = async () => {
+  const cacheService = new CacheService();
   const collaborationsService = new CollaborationsService();
+  const albumsService = new AlbumsService(cacheService);
   const playlistsService = new PlaylistsService(collaborationsService);
   const authenticationsService = new AuthenticationsService();
   const usersService = new UsersService();
@@ -94,7 +100,7 @@ const init = async () => {
     {
       plugin: albums,
       options: {
-        service: new AlbumsService(),
+        service: albumsService,
         validator: AlbumsValidator,
         storageService: storageService,
       },

@@ -66,15 +66,18 @@ class AlbumsHandler {
         id,
       } = request.params;
       const album = await this._service.getAlbumById(id);
-      // const songs = await this._service.getSongsByAlbumId(id);
-      // album['songs'] = songs;
-
-      return {
+      const response = h.response({
         status: 'success',
         data: {
-          album,
-        },
-      };
+          album: album.albumSongs
+        }
+      });
+
+      if (album.source === 'cache') {
+        response.header('X-Data-Source', 'cache');
+      }
+
+      return response;
     } catch (error) {
       if (error instanceof ClientError) {
         const response = h.response({
@@ -262,7 +265,10 @@ class AlbumsHandler {
           likes: likes.albumLikes
         }
       });
-
+      if (likes.source === 'cache') {
+        response.header('X-Data-Source', 'cache');
+        return response;
+      }
       return response;
     } catch (error) {
       if (error instanceof ClientError) {
