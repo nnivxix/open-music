@@ -54,7 +54,6 @@ class SongsService {
     }
 
     return filteredSong;
-    // return result.rows.map(mapSongDB);
   }
 
   async getSongById(id) {

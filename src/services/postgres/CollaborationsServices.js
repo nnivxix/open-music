@@ -15,12 +15,12 @@ class CollaborationsService {
     const queryUser = {
       text: 'SELECT * FROM users WHERE id = $1',
       values: [userId]
-    }
+    };
 
-    const resultUser = await this._pool.query(queryUser)
+    const resultUser = await this._pool.query(queryUser);
 
     if (!resultUser.rows.length) {
-      throw new NotFoundError('User tidak ditemukan')
+      throw new NotFoundError('User tidak ditemukan');
     }
 
     const id = `collab-${nanoid(16)}`;
