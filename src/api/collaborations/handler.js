@@ -25,7 +25,7 @@ class CollaborationsHandler {
 
       await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
       // await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
-      await this._collaborationsService.verifyCollaborator(playlistId, userId);
+      // await this._collaborationsService.verifyCollaborator(playlistId, userId);
       const collaborationId = await this._collaborationsService.addCollaboration(playlistId, userId);
 
       const response = h.response({
@@ -75,13 +75,18 @@ class CollaborationsHandler {
       await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
       await this._collaborationsService.deleteCollaboration(playlistId, userId);
 
-      const response = h.response({
+      // const response = h.response({
+      //   status: 'success',
+      //   message: 'Kolaborasi berhasil dihapus'
+      // });
+
+      // response.code(200);
+      // return response;
+
+      return {
         status: 'success',
         message: 'Kolaborasi berhasil dihapus'
-      });
-
-      response.code(200);
-      return response;
+      }
     } catch (error) {
       if (error instanceof ClientError) {
         const response = h.response({

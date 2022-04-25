@@ -83,6 +83,7 @@ class AlbumsService {
     if (!result.rows.length) {
       throw new NotFoundError('Gagal memperbarui album. Id tidak ditemukan');
     }
+    await this._cacheService.delete(`album-songs:${id}`);
   }
 
   async deleteAlbumById(id) {
@@ -96,6 +97,7 @@ class AlbumsService {
     if (!result.rows.length) {
       throw new NotFoundError('Album gagal dihapus. Id tidak ditemukan');
     }
+    await this._cacheService.delete(`album-songs:${id}`);
   }
 
   async postAlbumCoverById(id, cover) {

@@ -3,6 +3,7 @@ node_modules
 .prod.env
 
 NOTE.md
+Todo.md
 *.rar
 *.zip
 

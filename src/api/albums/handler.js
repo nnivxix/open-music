@@ -107,10 +107,13 @@ class AlbumsHandler {
 
       await this._service.editAlbumById(id, request.payload, );
 
-      return {
+      const response = h.response({
         status: 'success',
-        message: 'Album berhasil diperbarui',
-      };
+        message: 'Album berhasil diubah'
+      });
+
+      response.code(200);
+      return response;
     } catch (error) {
       if (error instanceof ClientError) {
         const response = h.response({

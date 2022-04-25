@@ -52,8 +52,8 @@ class PlaylistsService {
 
     const deleteResult = await this._pool.query(query);
 
-    if (deleteResult.rows.length === 0) {
-      throw new NotFoundError('Playlist gagal dihapus.Id tidak ditemukan');
+    if (!deleteResult.rows.length) {
+      throw new NotFoundError('Playlist gagal dihapus. Id tidak ditemukan');
     }
   }
 
