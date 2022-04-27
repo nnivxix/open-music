@@ -1,8 +1,10 @@
 const path = require('path');
-require('dotenv', ).config();
+require('dotenv').config();
 const Hapi = require('@hapi/hapi', );
 const Jwt = require('@hapi/jwt');
 const Inert = require('@hapi/inert');
+const ClientError = require('./exceptions/ClientError');
+
 // songs
 const songs = require('./api/songs', );
 const SongsValidator = require('./validator/songs');
@@ -63,6 +65,38 @@ const init = async () => {
       },
     },
   }, );
+
+  // Error handling
+  server.ext('onPreResponse', (request, h) => {
+    const {
+      response
+    } = request;
+    if (response instanceof ClientError) {
+      const newResponse = h.response({
+        status: 'fail',
+        message: response.message,
+      });
+      newResponse.code(response.statusCode);
+      return newResponse;
+    }
+    if (response instanceof Error) {
+      const {
+        statusCode,
+        payload
+      } = response.output;
+      if (statusCode === 401) {
+        return h.response(payload).code(401);
+      }
+      const newResponse = h.response({
+        status: 'error',
+        message: 'Maaf, terjadi kegagalan pada server kami.',
+      });
+      console.log(response);
+      newResponse.code(500);
+      return newResponse;
+    }
+    return response.continue || response;
+  });
 
   // registrasi plugin eksternal
   await server.register([{
