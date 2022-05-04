@@ -66,16 +66,14 @@ const init = async () => {
     },
   }, );
 
-  // Error handling
   server.ext('onPreResponse', (request, h) => {
+    // mendapatkan konteks response dari request
     const {
       response
     } = request;
-<<<<<<< HEAD
 
-=======
->>>>>>> c5e61bada5abc02b6a25367e3a0af901350f9c6e
     if (response instanceof ClientError) {
+      // membuat response baru dari response toolkit sesuai kebutuhan error handling
       const newResponse = h.response({
         status: 'fail',
         message: response.message,
@@ -83,27 +81,8 @@ const init = async () => {
       newResponse.code(response.statusCode);
       return newResponse;
     }
-<<<<<<< HEAD
 
     // jika bukan ClientError, lanjutkan dengan response sebelumnya (tanpa terintervensi)
-=======
-    if (response instanceof Error) {
-      const {
-        statusCode,
-        payload
-      } = response.output;
-      if (statusCode === 401) {
-        return h.response(payload).code(401);
-      }
-      const newResponse = h.response({
-        status: 'error',
-        message: 'Maaf, terjadi kegagalan pada server kami.',
-      });
-      console.log(response);
-      newResponse.code(500);
-      return newResponse;
-    }
->>>>>>> c5e61bada5abc02b6a25367e3a0af901350f9c6e
     return response.continue || response;
   });
 
