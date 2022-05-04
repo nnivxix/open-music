@@ -45,10 +45,21 @@ class AlbumsHandler {
     const response = h.response({
       status: 'success',
       data: {
+<<<<<<< HEAD
         album: album
       }
     });
 
+=======
+        album: album.albumSongs
+      }
+    });
+
+    if (album.source === 'cache') {
+      response.header('X-Data-Source', 'cache');
+    }
+
+>>>>>>> c5e61bada5abc02b6a25367e3a0af901350f9c6e
     return response;
   }
   async putAlbumByIdHandler(request, h, ) {
