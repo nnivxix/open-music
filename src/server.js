@@ -71,6 +71,7 @@ const init = async () => {
     const {
       response
     } = request;
+
     if (response instanceof ClientError) {
       const newResponse = h.response({
         status: 'fail',
@@ -79,22 +80,8 @@ const init = async () => {
       newResponse.code(response.statusCode);
       return newResponse;
     }
-    if (response instanceof Error) {
-      const {
-        statusCode,
-        payload
-      } = response.output;
-      if (statusCode === 401) {
-        return h.response(payload).code(401);
-      }
-      const newResponse = h.response({
-        status: 'error',
-        message: 'Maaf, terjadi kegagalan pada server kami.',
-      });
-      console.log(response);
-      newResponse.code(500);
-      return newResponse;
-    }
+
+    // jika bukan ClientError, lanjutkan dengan response sebelumnya (tanpa terintervensi)
     return response.continue || response;
   });
 

@@ -45,13 +45,9 @@ class AlbumsHandler {
     const response = h.response({
       status: 'success',
       data: {
-        album: album.albumSongs
+        album: album
       }
     });
-
-    if (album.source === 'cache') {
-      response.header('X-Data-Source', 'cache');
-    }
 
     return response;
   }
